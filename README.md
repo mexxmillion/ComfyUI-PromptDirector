@@ -14,6 +14,8 @@ No cloud API, model download, account, or background server is required.
 | MiniMax H3 — Image to Video | Exact first-frame instruction followed by H3's three audiovisual fields |
 | MiniMax H3 — Reference to Video | H3's six-section full-reference format with stable labels |
 
+`Video Frames for VL` is the companion adapter for Video Helper Suite. It evenly samples an uploaded video's `IMAGE` batch and produces an ordered frame batch plus timestamp context for Prompt Director or another vision-language node.
+
 The Krea 2 instructions follow the official [Krea 2 expansion guidance](https://github.com/krea-ai/krea-2/blob/main/docs/expansion.txt). H3 modes follow MiniMax's official [base-mode](https://huggingface.co/MiniMaxAI/MiniMax-H3/blob/main/docs/VIDEO_PROMPT_WRITING_GUIDE_base_en.md) and [full-reference](https://huggingface.co/MiniMaxAI/MiniMax-H3/blob/main/docs/VIDEO_PROMPT_WRITING_GUIDE_ref_en.md) guides.
 
 ## Why an external process?
@@ -104,6 +106,16 @@ same reference media ───────────────────�
 ```
 
 Reference images connected to Prompt Director are shown to the LLM for planning. They are not passed through and do not become generation conditioning automatically; connect the same images to the downstream Krea 2 or H3 nodes.
+
+For a video reference, connect the nodes this way:
+
+```text
+VHS Load Video IMAGE ─────→ Video Frames for VL sampled_frames ─→ Prompt Director reference_image_1
+VHS Load Video video_info ─→ Video Frames for VL video_info
+                             Video Frames for VL reference_context ─→ Prompt Director reference_context
+```
+
+The default eight samples include the first and last loaded frames and are distributed evenly between them. Prompt Director sends the entire sampled batch to Qwen-VL in chronological order. The original video should still be connected separately to the downstream H3 reference input; sampled frames are only for prompt analysis.
 
 The `report` output states which profile ran, how many attempts were used, whether structural validation passed, how many images reached the LLM, and whether the managed server was released.
 

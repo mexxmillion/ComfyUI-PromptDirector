@@ -19,6 +19,7 @@ try:
         validate_output,
     )
     from .runtime import random_seed, run_managed_server
+    from .video import sample_video_frames
 except ImportError:
     from config import load_config, profile_options, resolve_profile
     from prompts import (
@@ -33,6 +34,7 @@ except ImportError:
         validate_output,
     )
     from runtime import random_seed, run_managed_server
+    from video import sample_video_frames
 
 
 logger = logging.getLogger(__name__)
@@ -84,6 +86,13 @@ class PromptDirector(io.ComfyNode):
                     control_after_generate=io.ControlAfterGenerate.randomize,
                 ),
                 io.Int.Input("max_attempts", default=2, min=1, max=4, advanced=True),
+                io.String.Input(
+                    "reference_context",
+                    default="",
+                    multiline=True,
+                    optional=True,
+                    tooltip="Optional timeline metadata from Video Frames for VL.",
+                ),
                 io.Autogrow.Input(
                     "reference_images",
                     optional=True,
@@ -114,6 +123,7 @@ class PromptDirector(io.ComfyNode):
         duration: int,
         seed: int,
         max_attempts: int,
+        reference_context: str = "",
         reference_images: dict[str, object] | None = None,
     ) -> io.NodeOutput:
         original = prompt.strip()
@@ -142,7 +152,15 @@ class PromptDirector(io.ComfyNode):
         spec = MODE_SPECS[mode]
         system_prompt = build_system_prompt(mode, creativity)
         user_prompt = build_user_prompt(mode, original, duration, len(images))
-        validator = lambda value: validate_output(mode, normalize_output(mode, value), len(images))
+        if reference_context.strip():
+            user_prompt += f"\n\nReference sequence metadata:\n{reference_context.strip()}"
+        reference_labels = ("<Video 1>",) if "<Video 1>" in reference_context else ()
+        validator = lambda value: validate_output(
+            mode,
+            normalize_output(mode, value),
+            len(images),
+            reference_labels,
+        )
         temperature = {"Faithful": 0.2, "Balanced": 0.45, "Cinematic": 0.65}.get(creativity, 0.45)
 
         try:
@@ -169,7 +187,7 @@ class PromptDirector(io.ComfyNode):
             return io.NodeOutput(original, report)
 
         final = normalize_output(mode, outputs[-1]) if outputs else ""
-        errors = validate_output(mode, final, len(images)) if final else ["The LLM returned no text."]
+        errors = validate_output(mode, final, len(images), reference_labels) if final else ["The LLM returned no text."]
         status = "passed validation" if not errors else "returned with validation warnings"
         report_parts = [
             f"{mode}: {status} after {len(outputs)} attempt(s).",
@@ -183,14 +201,47 @@ class PromptDirector(io.ComfyNode):
         return io.NodeOutput(final or original, "\n".join(report_parts))
 
 
-NODE_CLASS_MAPPINGS = {"PromptDirector": PromptDirector}
-NODE_DISPLAY_NAME_MAPPINGS = {"PromptDirector": "Prompt Director"}
+class VideoFramesForVL(io.ComfyNode):
+    @classmethod
+    def define_schema(cls):
+        return io.Schema(
+            node_id="VideoFramesForVL",
+            display_name="Video Frames for VL",
+            category="prompt/director",
+            description="Evenly sample a VHS video frame batch for a vision-language model.",
+            inputs=[
+                io.Image.Input("video_frames", tooltip="Connect IMAGE from a VHS Load Video node."),
+                io.Int.Input("sample_count", default=8, min=1, max=32, step=1),
+                io.Custom("VHS_VIDEOINFO").Input(
+                    "video_info",
+                    optional=True,
+                    tooltip="Connect video_info from VHS to include relative timestamps.",
+                ),
+            ],
+            outputs=[
+                io.Image.Output("sampled_frames"),
+                io.String.Output("reference_context"),
+                io.Int.Output("sampled_count"),
+            ],
+        )
+
+    @classmethod
+    def execute(cls, video_frames, sample_count: int, video_info: dict | None = None) -> io.NodeOutput:
+        sampled, context, count = sample_video_frames(video_frames, sample_count, video_info)
+        return io.NodeOutput(sampled, context, count)
+
+
+NODE_CLASS_MAPPINGS = {"PromptDirector": PromptDirector, "VideoFramesForVL": VideoFramesForVL}
+NODE_DISPLAY_NAME_MAPPINGS = {
+    "PromptDirector": "Prompt Director",
+    "VideoFramesForVL": "Video Frames for VL",
+}
 
 
 class PromptDirectorExtension(ComfyExtension):
     @override
     async def get_node_list(self) -> list[type[io.ComfyNode]]:
-        return [PromptDirector]
+        return [PromptDirector, VideoFramesForVL]
 
 
 async def comfy_entrypoint() -> PromptDirectorExtension:

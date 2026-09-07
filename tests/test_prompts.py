@@ -51,8 +51,15 @@ def test_h3_r2v_reports_missing_picture():
     body = " ".join(["reference detail"] * 60)
     text = "\n".join(f"{field} {body}" for field in H3_REFERENCE_FIELDS)
     errors = validate_output(H3_R2V, text, 2)
-    assert "Picture 1 is not referenced." in errors
-    assert "Picture 2 is not referenced." in errors
+    assert "<Picture 1> is not referenced." in errors
+    assert "<Picture 2> is not referenced." in errors
+
+
+def test_h3_r2v_accepts_video_reference_label():
+    body = " ".join(["reference detail"] * 60)
+    text = "\n".join(f"{field} [Shot 1] <Video 1> {body}" for field in H3_REFERENCE_FIELDS)
+    errors = validate_output(H3_R2V, text, 1, ("<Video 1>",))
+    assert "<Video 1> is not referenced." not in errors
 
 
 def test_krea_rejects_known_bad_prompt_tokens():

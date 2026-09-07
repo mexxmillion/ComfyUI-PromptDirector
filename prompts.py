@@ -127,7 +127,7 @@ Assign stable <Subject N>, <Picture N>, <Video N>, and <Audio N> labels. Every l
 
 subject_definitions gives each used reference or reusable subject its own precise definition. summary begins with a bracketed task description such as [reference generation], then states the target and principal reference relationships. retention_analysis gives one line per referenced item and marks it fully_preserved, partially_preserved, attribute_transfer, or weak_reference; audio may instead use fully_copy, partially_copy, reference, or weak_reference.
 
-detailed_description is the full playback-order timeline. State explicitly what is preserved, transferred, replaced, copied, or modified. Do not infer a transfer relationship merely because two references are attached. Mention every attached Picture at least once, directly or as the source of a Subject. Use all six sections even when non_diegetic_music is N/A."""
+detailed_description is the full playback-order timeline. State explicitly what is preserved, transferred, replaced, copied, or modified. Do not infer a transfer relationship merely because two references are attached. Mention every attached Picture or Video at least once, directly or as the source of a Subject. Use all six sections even when non_diegetic_music is N/A."""
 
 
 MODE_SPECS = {
@@ -190,7 +190,12 @@ def _ordered_fields(text: str, fields: tuple[str, ...]) -> bool:
     return all(position >= 0 for position in positions) and positions == sorted(positions)
 
 
-def validate_output(mode: str, text: str, reference_count: int) -> list[str]:
+def validate_output(
+    mode: str,
+    text: str,
+    reference_count: int,
+    reference_labels: tuple[str, ...] = (),
+) -> list[str]:
     errors: list[str] = []
     spec = MODE_SPECS[mode]
     if len(text.split()) < spec.minimum_words:
@@ -231,7 +236,8 @@ def validate_output(mode: str, text: str, reference_count: int) -> list[str]:
             errors.append("The timeline must begin with [Shot 1].")
         if re.search(r"\[Shot 1\]\s+(?:At\s+)?(?:00:)?0{1,2}[:.]", timeline, re.IGNORECASE):
             errors.append("Shot 1 must not have a timestamp.")
-        for index in range(1, reference_count + 1):
-            if f"<Picture {index}>" not in text:
-                errors.append(f"Picture {index} is not referenced.")
+        labels = reference_labels or tuple(f"<Picture {index}>" for index in range(1, reference_count + 1))
+        for label in labels:
+            if label not in text:
+                errors.append(f"{label} is not referenced.")
     return errors

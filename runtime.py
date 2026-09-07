@@ -139,21 +139,22 @@ def stop_server(process: subprocess.Popen | None) -> None:
         process.wait(timeout=5)
 
 
-def _image_data_urls(images: list, max_side: int = 1024) -> list[str]:
+def _image_data_urls(images: list, max_side: int = 1024) -> list[tuple[str, str]]:
     from PIL import Image
 
-    urls: list[str] = []
-    for tensor in images:
-        if tensor.ndim == 4:
-            tensor = tensor[0]
-        pixels = tensor.clamp(0, 1).mul(255).byte().cpu().numpy()
-        image = Image.fromarray(pixels)
-        if max(image.size) > max_side:
-            image.thumbnail((max_side, max_side), Image.Resampling.LANCZOS)
-        buffer = io.BytesIO()
-        image.convert("RGB").save(buffer, format="JPEG", quality=90)
-        encoded = base64.b64encode(buffer.getvalue()).decode("ascii")
-        urls.append(f"data:image/jpeg;base64,{encoded}")
+    urls: list[tuple[str, str]] = []
+    for reference_index, tensor in enumerate(images, 1):
+        frames = tensor if tensor.ndim == 4 else tensor.unsqueeze(0)
+        for frame_index, frame in enumerate(frames, 1):
+            pixels = frame.clamp(0, 1).mul(255).byte().cpu().numpy()
+            image = Image.fromarray(pixels)
+            if max(image.size) > max_side:
+                image.thumbnail((max_side, max_side), Image.Resampling.LANCZOS)
+            buffer = io.BytesIO()
+            image.convert("RGB").save(buffer, format="JPEG", quality=90)
+            encoded = base64.b64encode(buffer.getvalue()).decode("ascii")
+            label = f"Reference input {reference_index}, chronological frame {frame_index} of {len(frames)}:"
+            urls.append((label, f"data:image/jpeg;base64,{encoded}"))
     return urls
 
 
@@ -168,8 +169,8 @@ def _chat_payload(
 ) -> bytes:
     if images:
         content: str | list[dict] = [{"type": "text", "text": user_prompt}]
-        for index, data_url in enumerate(_image_data_urls(images), 1):
-            content.append({"type": "text", "text": f"Attached reference image {index}:"})
+        for label, data_url in _image_data_urls(images):
+            content.append({"type": "text", "text": label})
             content.append({"type": "image_url", "image_url": {"url": data_url}})
     else:
         content = user_prompt
