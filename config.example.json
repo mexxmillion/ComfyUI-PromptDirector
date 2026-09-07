@@ -1,0 +1,16 @@
+{
+  "launcher_catalog": "C:/path/to/launcher-profiles.json",
+  "llama_server_path": "C:/path/to/llama-server.exe",
+  "default_profile": "qwen-9b-vision",
+  "extra_server_args": ["-ngl", "99", "-fa", "on", "--jinja", "--reasoning", "off"],
+  "profiles": [
+    {
+      "id": "qwen-9b-vision",
+      "label": "Qwen 9B Vision",
+      "model": "C:/path/to/model.gguf",
+      "mmproj": "C:/path/to/mmproj.gguf",
+      "alias": "qwen-9b",
+      "kv": "q8_0"
+    }
+  ]
+}

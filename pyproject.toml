@@ -1,0 +1,21 @@
+[project]
+name = "comfyui-prompt-director"
+version = "0.1.0"
+description = "Local prompt enhancement for Krea 2 and MiniMax H3 with deterministic llama.cpp VRAM handoff"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/mexxmillion/ComfyUI-PromptDirector"
+Issues = "https://github.com/mexxmillion/ComfyUI-PromptDirector/issues"
+
+[tool.comfy]
+PublisherId = "mexxmillion"
+DisplayName = "ComfyUI Prompt Director"
+Icon = ""
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
