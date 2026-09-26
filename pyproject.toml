@@ -1,7 +1,7 @@
 [project]
 name = "comfyui-prompt-director"
-version = "0.2.0"
-description = "Local prompt enhancement for Krea 2 and MiniMax H3 with deterministic llama.cpp VRAM handoff"
+version = "0.3.0"
+description = "Multimodal prompt enhancement for Krea 2 and MiniMax H3 with local and OpenRouter providers"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
