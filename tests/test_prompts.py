@@ -43,6 +43,8 @@ def test_every_builtin_h3_prompt_has_absolute_skin_color_artifact_guard():
         assert "MINIMAX H3 SKIN-COLOR ARTIFACT GUARD:" in prompt
         assert "Never repeat such wording from the user's request." in prompt
         assert "absolute renderer-compatibility rule" in prompt
+        assert "MINIMAX H3 FACIAL-ACTION ARTIFACT GUARD:" in prompt
+        assert "any lip-biting gesture" in prompt
 
 
 def test_h3_guard_wraps_custom_prompts_but_not_krea():
@@ -50,6 +52,7 @@ def test_h3_guard_wraps_custom_prompts_but_not_krea():
     guarded = ensure_h3_skin_color_artifact_guard(H3_FL2V, custom)
     assert guarded.startswith(custom)
     assert "SKIN-COLOR ARTIFACT GUARD" in guarded
+    assert "FACIAL-ACTION ARTIFACT GUARD" in guarded
     assert ensure_h3_skin_color_artifact_guard(KREA_EDIT, custom) == custom
 
 

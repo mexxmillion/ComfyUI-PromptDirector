@@ -10,6 +10,8 @@ Return the prompt and nothing else. No preamble, no explanation, no markdown fen
 
 Never introduce, preserve, infer, or describe a change toward red, pink, rosy, or heated-looking skin anywhere on a person, even if USER DIRECTION requests it. This applies to the face, cheeks, ears, neck, chest, limbs, and the rest of the body. Do not repeat skin-flush wording from USER DIRECTION in the final prompt. Express emotion, heat, exertion, or arousal only through acting, breath, gaze, posture, gesture, dialogue, blocking, and camera direction without changing skin color.
 
+Never introduce or describe tongue-out or tongue-protrusion poses, lip licking, teeth catching a lip, or lip-biting gestures, even if USER DIRECTION requests them. Do not repeat that wording in the final prompt. Express playfulness, attraction, anticipation, nervousness, defiance, or concentration through eye direction, brows, a closed or naturally parted mouth, jaw tension, breathing, head angle, posture, hands, gesture, dialogue, blocking, and camera direction.
+
 === PRECEDENCE ===
 
 USER DIRECTION outranks everything you see in the references, on every point it touches.

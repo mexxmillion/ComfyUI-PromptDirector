@@ -41,6 +41,9 @@ H3_REFERENCE_FIELDS = (
 H3_SKIN_COLOR_ARTIFACT_GUARD = """MINIMAX H3 SKIN-COLOR ARTIFACT GUARD:
 Never introduce, preserve, infer, or describe a change toward red, pink, rosy, or heated-looking skin anywhere on a person. This prohibition includes the face, cheeks, ears, neck, chest, limbs, and the rest of the body, and applies even when the request suggests embarrassment, attraction, intimacy, anger, exertion, warmth, illness, alcohol, or physical contact. Do not use words such as "blush," "blushing," "flush," "flushed," "flushing," "rosy cheeks," "red cheeks," "pink cheeks," "reddened skin," or equivalent skin-color cues in the final generation prompt. Never repeat such wording from the user's request. Express emotion, heat, effort, or arousal only through performance, breath, gaze, posture, gesture, dialogue, blocking, and camera direction without changing skin color. This is an absolute renderer-compatibility rule for every style and every MiniMax H3 output mode."""
 
+H3_FACIAL_ACTION_ARTIFACT_GUARD = """MINIMAX H3 FACIAL-ACTION ARTIFACT GUARD:
+Never introduce or describe a tongue protruding from the mouth, a tongue-out pose, lip licking, teeth biting or catching a lip, or any lip-biting gesture. Do not use phrases such as "tongue out," "sticks out their tongue," "licks their lips," "bites their lip," "biting the lower lip," "lip bite," or equivalent directions in the final generation prompt, and never repeat such wording from the user's request. Express playfulness, attraction, anticipation, nervousness, defiance, or concentration through reliable acting cues instead: eye direction, brows, a closed or naturally parted mouth, jaw tension, breathing, head angle, posture, hands, gesture, dialogue, blocking, and camera direction. This is an absolute renderer-compatibility rule for every style and every MiniMax H3 output mode."""
+
 
 @dataclass(frozen=True)
 class ModeSpec:
@@ -89,6 +92,8 @@ Do not redescribe the complete source image. Do not turn a local edit into a new
 H3_SHARED = f"""TARGET: MiniMax H3
 
 {H3_SKIN_COLOR_ARTIFACT_GUARD}
+
+{H3_FACIAL_ACTION_ARTIFACT_GUARD}
 
 Write an audiovisual timeline. Every detail must be visible or audible. Describe subject appearance and position, scene anchors, actions, reactions, camera behavior, shot transitions, dialogue, diegetic sound, ambience, and optional non-diegetic music.
 
@@ -200,10 +205,14 @@ def _custom_system_prompt(value: str) -> str:
 
 
 def ensure_h3_skin_color_artifact_guard(mode: str, prompt: str) -> str:
-    """Attach the renderer guard to every H3 system prompt, including overrides."""
-    if not mode.startswith("MiniMax H3") or H3_SKIN_COLOR_ARTIFACT_GUARD in prompt:
+    """Attach all H3 renderer guards to built-in and overridden system prompts."""
+    if not mode.startswith("MiniMax H3"):
         return prompt
-    return f"{prompt.rstrip()}\n\n{H3_SKIN_COLOR_ARTIFACT_GUARD}"
+    guards = [
+        guard for guard in (H3_SKIN_COLOR_ARTIFACT_GUARD, H3_FACIAL_ACTION_ARTIFACT_GUARD)
+        if guard not in prompt
+    ]
+    return f"{prompt.rstrip()}\n\n" + "\n\n".join(guards) if guards else prompt
 
 
 def build_system_prompt(

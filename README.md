@@ -28,7 +28,7 @@ The system-prompt preset also defines the expected output contract, so there is 
 
 The Krea 2 instructions follow the official [Krea 2 expansion guidance](https://github.com/krea-ai/krea-2/blob/main/docs/expansion.txt). H3 modes follow MiniMax's official [base-mode](https://huggingface.co/MiniMaxAI/MiniMax-H3/blob/main/docs/VIDEO_PROMPT_WRITING_GUIDE_base_en.md) and [full-reference](https://huggingface.co/MiniMaxAI/MiniMax-H3/blob/main/docs/VIDEO_PROMPT_WRITING_GUIDE_ref_en.md) guides.
 
-Every MiniMax H3 system-prompt path—including bundled, Reference Manager, file, and inline overrides—adds a renderer guard that forbids facial or body skin-color changes associated with blushing/flushing. Emotion, heat, and exertion are expressed through performance direction instead. This guard is H3-specific and does not alter Krea prompts.
+Every MiniMax H3 system-prompt path—including bundled, Reference Manager, file, and inline overrides—adds renderer guards that forbid facial or body skin-color changes associated with blushing/flushing and unreliable tongue-out, lip-licking, or lip-biting expressions. Emotion and intent are expressed through reliable performance direction instead. These guards are H3-specific and do not alter Krea prompts.
 
 ## Why an external process?
 
