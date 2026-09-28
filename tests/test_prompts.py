@@ -99,6 +99,13 @@ def test_clean_output_removes_reasoning_and_fences():
     assert clean_output(raw) == "A finished prompt."
 
 
+def test_user_prompt_includes_requested_output_size_and_video_length():
+    prompt = build_user_prompt(H3_R2V, "A slow orbit", 11, 0, width=1920, height=1080)
+
+    assert "Requested output size: 1920 x 1080" in prompt
+    assert "Requested duration: 11 seconds" in prompt
+
+
 def test_h3_i2v_contract_accepts_valid_shape():
     body = " ".join(["visible motion and synchronized sound"] * 30)
     text = (

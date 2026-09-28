@@ -1,6 +1,6 @@
 # ComfyUI Prompt Director
 
-Multimodal prompt enhancement for Krea 2 and MiniMax H3. The normal node surface is the request, one system-prompt preset, references, and one inference mode. Select `local llama` to start a configured GGUF, `openrouter` for the hosted API, `custom endpoint` for an existing OpenAI-compatible server, or `none` to pass the request through unchanged. Only fields required by the selected inference mode are shown.
+Multimodal prompt enhancement for Krea 2 and MiniMax H3. The normal node surface contains the request, output type, output dimensions/length, references, and one prompt engine. Select `local llama` to start a configured GGUF, `openrouter` for the hosted API, `custom endpoint` for an existing OpenAI-compatible server, or `none` to pass the request through unchanged. Only the model or URL required by the selected engine is shown. Advanced provider options and the system-prompt override live behind the gear button.
 
 ## System prompt presets
 
@@ -18,7 +18,7 @@ Multimodal prompt enhancement for Krea 2 and MiniMax H3. The normal node surface
 
 The node has incremental groups for up to nine images, three videos, and three audio clips. OpenRouter and existing local endpoints receive the native media content. The managed llama-server path sends video frames through its vision projector and leaves audio out of the LLM request. All media is passed through unchanged on H3-ready outputs in either case.
 
-`local llama` shows the configured GGUF choices plus a thinking toggle. OpenRouter shows its model ID, reasoning level, retry count, and key. `custom endpoint` defaults to the local `http://127.0.0.1:8080/v1` Bonsai preset and shows URL, model ID, thinking control, retries, and optional key. It never inherits the OpenRouter environment key. The report names the route and model actually used. Older saved provider values are still accepted.
+`local llama` shows only the configured GGUF choices. OpenRouter shows only its model ID. `custom endpoint` shows only its URL and defaults to local `http://127.0.0.1:8080/v1`. Keys, reasoning/thinking controls, retries, endpoint model ID, and failure behavior are available from the gear button. A custom endpoint never inherits the OpenRouter environment key. The report names the route and model actually used. Older saved provider values are still accepted.
 
 The optional **stop on enhancement failure** setting makes a workflow fail if the provider call fails or the enhanced prompt does not pass validation. It is off by default for existing graphs; Pocket AI Generator enables it for FL2V so a failed OpenRouter call cannot silently produce an unenhanced render.
 

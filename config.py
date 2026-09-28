@@ -92,9 +92,7 @@ def load_config(path: Path = CONFIG_PATH) -> DirectorConfig:
 def profile_options(config: DirectorConfig | None = None) -> tuple[list[str], dict[str, LlamaProfile]]:
     config = config or load_config()
     mapping = {profile.label: profile for profile in config.profiles}
-    # OpenRouter does not use a local GGUF profile; keep a portable combo value
-    # available even on fresh workers with no private config.json.
-    return (list(mapping) or ["Configure config.json"]) + ["OpenRouter (no local model)"], mapping
+    return list(mapping) or ["Configure config.json"], mapping
 
 
 def resolve_profile(selected: str, config: DirectorConfig | None = None) -> LlamaProfile:

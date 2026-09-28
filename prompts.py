@@ -248,9 +248,12 @@ def build_user_prompt(
     repair: str = "",
     video_count: int = 0,
     audio_count: int = 0,
+    width: int = 1280,
+    height: int = 720,
 ) -> str:
     parts = [
         f"Selected mode: {mode}",
+        f"Requested output size: {width} x {height}",
         f"Requested duration: {duration} seconds" if mode.startswith("MiniMax H3") else "",
         f"Attached reference images: {reference_count}",
         f"Attached reference videos: {video_count}",

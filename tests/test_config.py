@@ -42,7 +42,7 @@ def test_external_catalog_resolves_paths_from_catalog_root(tmp_path):
     config = load_config(config_path)
     labels, mapping = profile_options(config)
 
-    assert labels == ["Local Qwen", "OpenRouter (no local model)"]
+    assert labels == ["Local Qwen"]
     assert mapping["Local Qwen"].model_path == root / "models/qwen.gguf"
     assert resolve_profile("local", config).mmproj_path == root / "models/mmproj.gguf"
     assert resolve_profile("local", config).extra_server_args == ("--jinja",)
@@ -51,5 +51,5 @@ def test_external_catalog_resolves_paths_from_catalog_root(tmp_path):
 def test_missing_config_has_actionable_placeholder(tmp_path):
     config = load_config(tmp_path / "missing.json")
     labels, mapping = profile_options(config)
-    assert labels == ["Configure config.json", "OpenRouter (no local model)"]
+    assert labels == ["Configure config.json"]
     assert mapping == {}
